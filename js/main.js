@@ -79,7 +79,7 @@
                 document.fonts.load('100px Smartisan').then(() => {
                     context.font = '900 100px sans-serif,Smartisan'
                     context.fillStyle = '#4B5F64'
-                    context.fillText(`\ue900  ${exif.Model}`, fx, fy)
+                    context.fillText(`\ue900  Shot on ${exif.Model}`, fx, fy)
                     canvas.toBlob((blob) => {
                         try {
                             resolve(URL.createObjectURL(blob))

@@ -98,6 +98,7 @@ html, body {
 
 #toast-container {
     top: 60%;
+    left: inherit;
     right: 50%;
     transform: translateX(50%);
     min-width: inherit;
