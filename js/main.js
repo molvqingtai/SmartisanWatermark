@@ -35,6 +35,7 @@
                                         downloadBtn.removeAttribute('disabled')
                                         downloadBtn.textContent = '下载水印照片'
                                     }
+
                                 } else {
                                     iconsBtn.firstElementChild.style.display = 'none'
                                     iconsBtn.lastElementChild.style.display = 'block'
@@ -54,6 +55,7 @@
 
     }
     let drawing = (exif, base64, callback) => {
+
         return new Promise((resolve, reject) => {
             let canvas = document.createElement('canvas')
             let context = canvas.getContext('2d')
@@ -75,19 +77,20 @@
                 context.fillStyle = '#FFFFFF'
                 context.fillRect(0, 0, canvas.width, canvas.height)
                 context.drawImage(image, dx, dy, dw, dh, sx, sy, sw, sh)
-                // 加载字体
                 document.fonts.load('100px Smartisan').then(() => {
-                    context.font = '700 100px sans-serif,Smartisan'
-                    context.fillStyle = '#4B5F64'
-                    context.fillText(`\ue900  Shot on ${exif.Model}`, fx, fy)
-                    canvas.toBlob((blob) => {
-                        try {
-                            resolve(URL.createObjectURL(blob))
-                        } catch (e) {
-                            toastTip('照片EXIF信息不完整!')
-                            resolve(false)
-                        }
-                    }, 'image/jpeg', 1.0)
+                    getColor(image).then((res) => {
+                        context.font = '700 100px sans-serif,Smartisan'
+                        context.fillStyle = res
+                        context.fillText(`\ue900  Shot on ${exif.Model}`, fx, fy)
+                        canvas.toBlob((blob) => {
+                            try {
+                                resolve(URL.createObjectURL(blob))
+                            } catch (e) {
+                                toastTip('照片EXIF信息不完整!')
+                                resolve(false)
+                            }
+                        }, 'image/jpeg', 1.0)
+                    })
                 })
             }
             image.src = base64
@@ -98,6 +101,18 @@
             EXIF.getData(file, function() {
                 resolve(EXIF.getAllTags(this))
             })
+        })
+    }
+    let getColor = (image) => {
+        return new Promise((resolve, reject) => {
+            let colorThief = new ColorThief();
+            let colorArray = colorThief.getPalette(image, 10)
+            colorArray.unshift(colorThief.getColor(image))
+            colorArray.forEach((c) => {
+                let color = `rgb(${c[0]},${c[1]},${c[2]})`
+                tinycolor(color).isDark() ? resolve(color) : false
+            })
+
         })
     }
     let toastTip = (msg) => {
