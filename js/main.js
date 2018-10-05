@@ -7,6 +7,11 @@
         upload(e.target.files[0])
     })
     displayImg.addEventListener('click', (e) => {
+        e.preventDefault()
+        fullscreen(e.currentTarget)
+    })
+    displayImg.addEventListener('touchstart', (e) => {
+        e.preventDefault()
         fullscreen(e.currentTarget)
     })
     let upload = (file) => {
