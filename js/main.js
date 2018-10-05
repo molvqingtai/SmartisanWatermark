@@ -10,7 +10,7 @@
         e.preventDefault()
         fullscreen(e.currentTarget)
     })
-    displayImg.addEventListener('touchstart', (e) => {
+    displayImg.addEventListener('touch', (e) => {
         e.preventDefault()
         fullscreen(e.currentTarget)
     })
