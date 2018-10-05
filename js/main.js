@@ -77,7 +77,7 @@
                 context.drawImage(image, dx, dy, dw, dh, sx, sy, sw, sh)
                 // 加载字体
                 document.fonts.load('100px Smartisan').then(() => {
-                    context.font = '900 100px sans-serif,Smartisan'
+                    context.font = '700 100px sans-serif,Smartisan'
                     context.fillStyle = '#4B5F64'
                     context.fillText(`\ue900  Shot on ${exif.Model}`, fx, fy)
                     canvas.toBlob((blob) => {
