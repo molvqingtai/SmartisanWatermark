@@ -6,6 +6,9 @@
     uploadImg.addEventListener('change', (e) => {
         upload(e.target.files[0])
     })
+    displayImg.addEventListener('click', (e) => {
+        fullscreen(e.currentTarget)
+    })
     let upload = (file) => {
         if (file) {
             if (/image\/\w+/.test(file.type)) {
@@ -19,8 +22,8 @@
                             downloadBtn.textContent = '生成水印中...'
                             drawing(res, e.target.result, (url) => {
                                 displayImg.src = downloadBtn.href = url
-                                displayImg.onload = ()=>{
-                                    downloadBtn.download = file.name.slice(0, file.name.lastIndexOf('.'))+'.jpeg'
+                                displayImg.onload = () => {
+                                    downloadBtn.download = file.name.slice(0, file.name.lastIndexOf('.')) + '.jpeg'
                                     iconsBtn.firstElementChild.style.display = 'none'
                                     iconsBtn.lastElementChild.style.display = 'block'
                                     downloadBtn.removeAttribute('disabled')
@@ -87,5 +90,38 @@
             displayLength: 3000,
             classes: 'rounded'
         })
+    }
+
+
+
+    let fullscreen = (e) => {
+        let requestFullscreen = () => {
+            if (e.requestFullscreen) {
+                e.requestFullscreen()
+            } else if (e.webkitRequestFullScreen) {
+                if (window.navigator.userAgent.toUpperCase().indexOf('CHROME') >= 0) {
+                    e.webkitRequestFullScreen(Element.ALLOW_KEYBOARD_INPUT)
+                } else {
+                    e.webkitRequestFullScreen()
+                }
+            } else if (e.mozRequestFullScreen) {
+                e.mozRequestFullScreen()
+            }
+        }
+        let exitFullscreen = () => {
+            if (document.exitFullscreen) {
+                document.exitFullscreen()
+            } else if (document.webkitCancelFullScreen) {
+                document.webkitCancelFullScreen()
+            } else if (document.mozCancelFullScreen) {
+                document.mozCancelFullScreen()
+            }
+        }
+        let isFullscreen = () => {
+            return document.fullscreen || document.webkitIsFullScreen || document.mozFullScreen || false
+        }
+
+        isFullscreen() ? exitFullscreen() : requestFullscreen()
+
     }
 })(window)
