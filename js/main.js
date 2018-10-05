@@ -19,11 +19,13 @@
                             downloadBtn.textContent = '生成水印中...'
                             drawing(res, e.target.result, (url) => {
                                 displayImg.src = downloadBtn.href = url
-                                downloadBtn.download = file.name.slice(0, file.name.lastIndexOf('.'))
-                                iconsBtn.firstElementChild.style.display = 'none'
-                                iconsBtn.lastElementChild.style.display = 'block'
-                                downloadBtn.removeAttribute('disabled')
-                                downloadBtn.textContent = '下载水印照片'
+                                displayImg.onload = ()=>{
+                                    downloadBtn.download = file.name.slice(0, file.name.lastIndexOf('.'))+'.jpeg'
+                                    iconsBtn.firstElementChild.style.display = 'none'
+                                    iconsBtn.lastElementChild.style.display = 'block'
+                                    downloadBtn.removeAttribute('disabled')
+                                    downloadBtn.textContent = '下载水印照片'
+                                }
                             })
                         }
                         reader.readAsDataURL(file)
