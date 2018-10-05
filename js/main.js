@@ -86,7 +86,7 @@
                             try {
                                 resolve(URL.createObjectURL(blob))
                             } catch (e) {
-                                toastTip('照片EXIF信息不完整!')
+                                toastTip('照片EXIF信息错误!')
                                 resolve(false)
                             }
                         }, 'image/jpeg', 1.0)
