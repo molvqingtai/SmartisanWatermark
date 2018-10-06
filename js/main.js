@@ -23,8 +23,8 @@
                         reader.onload = (e) => {
                             iconsBtn.firstElementChild.style.display = 'block'
                             iconsBtn.lastElementChild.style.display = 'none'
-                            downloadBtn.setAttribute('disabled', 'disabled')
                             downloadBtn.textContent = '生成水印中...'
+                            downloadBtn.href = 'javascript::void(0);'
                             drawing(res, e.target.result).then((res) => {
                                 if (res) {
                                     displayImg.src = downloadBtn.href = res
@@ -32,14 +32,14 @@
                                         downloadBtn.download = file.name.slice(0, file.name.lastIndexOf('.')) + '.jpeg'
                                         iconsBtn.firstElementChild.style.display = 'none'
                                         iconsBtn.lastElementChild.style.display = 'block'
-                                        downloadBtn.removeAttribute('disabled')
                                         downloadBtn.textContent = '下载水印照片'
+                                        downloadBtn.removeAttribute('disabled')
                                     }
-
                                 } else {
                                     iconsBtn.firstElementChild.style.display = 'none'
                                     iconsBtn.lastElementChild.style.display = 'block'
                                     downloadBtn.textContent = '下载水印照片'
+                                    downloadBtn.setAttribute('disabled', 'disabled')
                                 }
                             })
                         }
@@ -110,9 +110,8 @@
             colorArray.unshift(colorThief.getColor(image))
             colorArray.forEach((c) => {
                 let color = `rgb(${c[0]},${c[1]},${c[2]})`
-                tinycolor(color).isDark() ? resolve(color) : false
+                tinycolor(color).isDark() ? resolve(color) : resolve('rgb(102, 102, 102)')
             })
-
         })
     }
     let toastTip = (msg) => {
