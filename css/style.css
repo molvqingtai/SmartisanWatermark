@@ -70,7 +70,7 @@ html, body {
 
 .form-wrapper .download {
     width: 100%;
-    margin-top: 10px;
+    margin: 10px auto;
     display: flex;
     align-items: center;
     align-content: center;
@@ -113,5 +113,5 @@ html, body {
     font-size: 12px;
     min-height: inherit;
     padding: 5px 15px;
-    white-space:nowrap;
+    white-space: nowrap;
 }
