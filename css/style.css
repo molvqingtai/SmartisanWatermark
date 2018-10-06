@@ -71,6 +71,10 @@ html, body {
 .form-wrapper .download {
     width: 100%;
     margin-top: 10px;
+    display: flex;
+    align-items: center;
+    align-content: center;
+    justify-content: center;
 }
 
 .form-wrapper .download[disabled] {

@@ -23,7 +23,7 @@
                         reader.onload = (e) => {
                             iconsBtn.firstElementChild.style.display = 'block'
                             iconsBtn.lastElementChild.style.display = 'none'
-                            downloadBtn.textContent = '生成水印中...'
+                            downloadBtn.innerHTML = '生成水印中...'
                             downloadBtn.href = 'javascript::void(0);'
                             drawing(res, e.target.result).then((res) => {
                                 if (res) {
@@ -32,13 +32,13 @@
                                         downloadBtn.download = file.name.slice(0, file.name.lastIndexOf('.')) + '.jpeg'
                                         iconsBtn.firstElementChild.style.display = 'none'
                                         iconsBtn.lastElementChild.style.display = 'block'
-                                        downloadBtn.textContent = '下载水印照片'
+                                        downloadBtn.innerHTML = `下载水印照片<i class="material-icons">file_download</i>`
                                         downloadBtn.removeAttribute('disabled')
                                     }
                                 } else {
                                     iconsBtn.firstElementChild.style.display = 'none'
                                     iconsBtn.lastElementChild.style.display = 'block'
-                                    downloadBtn.textContent = '下载水印照片'
+                                    downloadBtn.innerHTML = `下载水印照片<i class="material-icons">file_download</i>`
                                     downloadBtn.setAttribute('disabled', 'disabled')
                                 }
                             })
