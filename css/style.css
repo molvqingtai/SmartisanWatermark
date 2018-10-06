@@ -113,4 +113,5 @@ html, body {
     font-size: 12px;
     min-height: inherit;
     padding: 5px 15px;
+    white-space:nowrap;
 }
