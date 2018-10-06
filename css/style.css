@@ -101,7 +101,7 @@ html, body {
 }
 
 #toast-container {
-    top: 60%;
+    top: 62%;
     left: inherit;
     right: 50%;
     transform: translateX(50%);
