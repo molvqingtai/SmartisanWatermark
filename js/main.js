@@ -60,7 +60,6 @@
             let canvas = document.createElement('canvas')
             let context = canvas.getContext('2d')
             let image = new Image()
-            let logo = new Image()
             let dx = 0
             let dy = 0
             let dw = exif.PixelXDimension
