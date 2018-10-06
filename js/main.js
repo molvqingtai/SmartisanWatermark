@@ -18,7 +18,7 @@
         if (file) {
             if (/image\/\w+/.test(file.type)) {
                 getEXIF(file).then((res) => {
-                    if (Object.keys(res).length > 0 && res.Make.includes('Smartisan') || res.Model.includes('Smartisan')) {
+                    if (Object.keys(res).length > 0 && res.Make.includes('Smartisan')) {
                         let reader = new FileReader()
                         reader.onload = (e) => {
                             iconsBtn.firstElementChild.style.display = 'block'
