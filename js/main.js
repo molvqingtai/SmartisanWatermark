@@ -4,45 +4,34 @@
     let downloadBtn = document.querySelector('#download-btn')
     let iconsBtn = document.querySelector('#icons-btn')
     uploadImg.addEventListener('change', (e) => {
-        upload(e.target.files[0])
+        stamp(e.target.files[0])
     })
     displayImg.addEventListener('click', (e) => {
         e.preventDefault()
-        console.log(e.currentTarget);
         fullscreen(e.currentTarget)
     })
     displayImg.addEventListener('touch', (e) => {
         e.preventDefault()
         fullscreen(e.currentTarget)
     })
-    let upload = (file) => {
+
+    /**
+     * [stamp 水印戳]
+     * @param  {[Object]} file [图片数据]
+     */
+    let stamp = (file) => {
         if (file) {
             if (/image\/\w+/.test(file.type)) {
                 getEXIF(file).then((res) => {
                     if (Object.keys(res).length > 0 && res.Make.includes('Smartisan')) {
                         let reader = new FileReader()
                         reader.onload = (e) => {
-                            iconsBtn.firstElementChild.style.display = 'block'
-                            iconsBtn.lastElementChild.style.display = 'none'
-                            downloadBtn.innerHTML = '生成水印中...'
-                            downloadBtn.href = 'javascript::void(0);'
+                            ontrolState('start')
                             drawing(res, e.target.result).then((res) => {
-                                if (res) {
-                                    displayImg.src = downloadBtn.href = res
-                                    displayImg.onload = () => {
-                                        downloadBtn.download = file.name.slice(0, file.name.lastIndexOf('.')) + '.jpeg'
-                                        iconsBtn.firstElementChild.style.display = 'none'
-                                        iconsBtn.lastElementChild.style.display = 'block'
-                                        downloadBtn.innerHTML = `下载水印照片<i class="material-icons">file_download</i>`
-                                        downloadBtn.removeAttribute('disabled')
-                                    }
-                                } else {
-                                    iconsBtn.firstElementChild.style.display = 'none'
-                                    iconsBtn.lastElementChild.style.display = 'block'
-                                    downloadBtn.innerHTML = `下载水印照片<i class="material-icons">file_download</i>`
-                                    downloadBtn.setAttribute('disabled', 'disabled')
-                                    toastTip('照片EXIF信息错误!')
-                                }
+                                let name = file.name.slice(0, file.name.lastIndexOf('.')) + '.jpeg'
+                                ontrolState('end', { url: res, name: name })
+                            }, (rej) => {
+                                ontrolState('error')
                             })
                         }
                         reader.readAsDataURL(file)
@@ -56,7 +45,14 @@
         }
 
     }
-    let drawing = (exif, base64, callback) => {
+
+    /**
+     * [drawing 绘制水印]
+     * @param  {[Object]}   exif     [图片EXIF]
+     * @param  {[String]}   base64   [图片Base64]
+     * @return {[String]}            [图片Blob url]
+     */
+    let drawing = (exif, base64) => {
 
         return new Promise((resolve, reject) => {
             let canvas = document.createElement('canvas')
@@ -75,28 +71,34 @@
             canvas.width = exif.PixelXDimension
             canvas.height = exif.PixelYDimension + exif.PixelYDimension * 0.12
             image.onload = () => {
-                context.fillStyle = '#FFFFFF'
-                context.fillRect(0, 0, canvas.width, canvas.height)
-                context.drawImage(image, dx, dy, dw, dh, sx, sy, sw, sh)
-
                 document.fonts.load('100px Smartisan').then(() => {
                     getColor(image).then((res) => {
+                        context.fillStyle = '#FFFFFF'
+                        context.fillRect(0, 0, canvas.width, canvas.height)
+                        context.drawImage(image, dx, dy, dw, dh, sx, sy, sw, sh)
                         context.font = '700 100px sans-serif,Smartisan'
                         context.fillStyle = res
                         context.fillText(`\ue900  Shot on ${exif.Model}`, fx, fy)
                         canvas.toBlob((blob) => {
                             try {
                                 resolve(URL.createObjectURL(blob))
-                            } catch (e) {
-                                resolve(false)
+                            } catch (error) {
+                                reject(error)
                             }
                         }, 'image/jpeg', 1.0)
                     })
                 })
             }
+            //可以直接用URL.createObjectURL(file),但是会多创建一个url对象
             image.src = base64
         })
     }
+
+    /**
+     * [getEXIF 获取EXIF]
+     * @param  {[Object]} file [图片数据]
+     * @return {[Object]}      [EXIF对象]
+     */
     let getEXIF = (file) => {
         return new Promise((resolve, reject) => {
             EXIF.getData(file, function() {
@@ -104,6 +106,12 @@
             })
         })
     }
+
+    /**
+     * [getColor 获取主色]
+     * @param  {[Object]} image [图片对象]
+     * @return {[String]}       [图片主色]
+     */
     let getColor = (image) => {
         return new Promise((resolve, reject) => {
             let colorThief = new ColorThief();
@@ -115,6 +123,46 @@
             })
         })
     }
+
+    /**
+     * [ontrolState 状态控制]
+     * @param  {[String]} state [状态信息]
+     * @param  {[Object]} image [图片信息]
+     */
+    let ontrolState = (state, image) => {
+        switch (state) {
+            case 'start':
+                iconsBtn.firstElementChild.style.display = 'block'
+                iconsBtn.lastElementChild.style.display = 'none'
+                downloadBtn.innerHTML = '生成水印中...'
+                downloadBtn.href = 'javascript::void(0);'
+                break
+
+            case 'end':
+                displayImg.src = downloadBtn.href = image.url
+                displayImg.onload = () => {
+                    downloadBtn.download = image.name
+                    iconsBtn.firstElementChild.style.display = 'none'
+                    iconsBtn.lastElementChild.style.display = 'block'
+                    downloadBtn.innerHTML = `下载水印照片<i class="material-icons">file_download</i>`
+                    downloadBtn.removeAttribute('disabled')
+                }
+                break
+
+            case 'error':
+                iconsBtn.firstElementChild.style.display = 'none'
+                iconsBtn.lastElementChild.style.display = 'block'
+                downloadBtn.innerHTML = `下载水印照片<i class="material-icons">file_download</i>`
+                downloadBtn.setAttribute('disabled', 'disabled')
+                toastTip('照片EXIF信息错误!')
+                break
+        }
+    }
+
+    /**
+     * [toastTip 弹窗提示]
+     * @param  {[String]} msg [提示信息]
+     */
     let toastTip = (msg) => {
         uploadImg.value = ''
         M.toast({
@@ -124,6 +172,10 @@
         })
     }
 
+    /**
+     * [fullscreen 全屏控制]
+     * @param  {[Object]} e [全屏对象]
+     */
     let fullscreen = (e) => {
         let requestFullscreen = () => {
             if (e.requestFullscreen) {
@@ -154,4 +206,6 @@
         isFullscreen() ? exitFullscreen() : requestFullscreen()
 
     }
+
+
 })(window)
