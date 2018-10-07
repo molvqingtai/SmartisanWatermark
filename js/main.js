@@ -8,6 +8,7 @@
     })
     displayImg.addEventListener('click', (e) => {
         e.preventDefault()
+        console.log(e.currentTarget);
         fullscreen(e.currentTarget)
     })
     displayImg.addEventListener('touch', (e) => {
@@ -40,6 +41,7 @@
                                     iconsBtn.lastElementChild.style.display = 'block'
                                     downloadBtn.innerHTML = `下载水印照片<i class="material-icons">file_download</i>`
                                     downloadBtn.setAttribute('disabled', 'disabled')
+                                    toastTip('照片EXIF信息错误!')
                                 }
                             })
                         }
@@ -76,6 +78,7 @@
                 context.fillStyle = '#FFFFFF'
                 context.fillRect(0, 0, canvas.width, canvas.height)
                 context.drawImage(image, dx, dy, dw, dh, sx, sy, sw, sh)
+
                 document.fonts.load('100px Smartisan').then(() => {
                     getColor(image).then((res) => {
                         context.font = '700 100px sans-serif,Smartisan'
@@ -85,7 +88,6 @@
                             try {
                                 resolve(URL.createObjectURL(blob))
                             } catch (e) {
-                                toastTip('照片EXIF信息错误!')
                                 resolve(false)
                             }
                         }, 'image/jpeg', 1.0)
