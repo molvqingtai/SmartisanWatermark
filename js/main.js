@@ -114,7 +114,7 @@
      */
     let getColor = (image) => {
         return new Promise((resolve, reject) => {
-            let colorThief = new ColorThief();
+            let colorThief = new ColorThief()
             let colorArray = colorThief.getPalette(image, 10)
             colorArray.unshift(colorThief.getColor(image))
             colorArray.forEach((c) => {
