@@ -55,22 +55,24 @@
      */
     let drawing = (exif, base64) => {
 
+
+        let canvas = document.createElement('canvas')
+        let context = canvas.getContext('2d')
+        let image = new Image()
+        let dx = 0
+        let dy = 0
+        let dw = exif.PixelXDimension
+        let dh = exif.PixelYDimension
+        let sx = exif.PixelXDimension * 0.02
+        let sy = exif.PixelYDimension * 0.02
+        let sw = exif.PixelXDimension * 0.96
+        let sh = exif.PixelYDimension * 0.96
+        let fx = exif.PixelXDimension * 0.04
+        let fy = exif.PixelYDimension * 1.04
+        canvas.width = exif.PixelXDimension
+        canvas.height = exif.PixelYDimension + exif.PixelYDimension * 0.12
+
         return new Promise((resolve, reject) => {
-            let canvas = document.createElement('canvas')
-            let context = canvas.getContext('2d')
-            let image = new Image()
-            let dx = 0
-            let dy = 0
-            let dw = exif.PixelXDimension
-            let dh = exif.PixelYDimension
-            let sx = exif.PixelXDimension * 0.02
-            let sy = exif.PixelYDimension * 0.02
-            let sw = exif.PixelXDimension * 0.96
-            let sh = exif.PixelYDimension * 0.96
-            let fx = exif.PixelXDimension * 0.04
-            let fy = exif.PixelYDimension * 1.04
-            canvas.width = exif.PixelXDimension
-            canvas.height = exif.PixelYDimension + exif.PixelYDimension * 0.12
             image.onload = () => {
                 document.fonts.load('100px Smartisan').then(() => {
                     getColor(image).then((res) => {
