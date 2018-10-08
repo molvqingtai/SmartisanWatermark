@@ -31,6 +31,7 @@
                                 let name = file.name.slice(0, file.name.lastIndexOf('.')) + '.jpeg'
                                 ontrolState('end', { url: res, name: name })
                             }, (rej) => {
+                                toastTip('照片EXIF信息错误!')
                                 ontrolState('error')
                             })
                         }
@@ -154,7 +155,6 @@
                 iconsBtn.lastElementChild.style.display = 'block'
                 downloadBtn.innerHTML = `下载水印照片<i class="material-icons">file_download</i>`
                 downloadBtn.setAttribute('disabled', 'disabled')
-                toastTip('照片EXIF信息错误!')
                 break
         }
     }
