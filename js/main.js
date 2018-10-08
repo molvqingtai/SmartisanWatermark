@@ -55,7 +55,6 @@
      */
     let drawing = (exif, base64) => {
 
-
         let canvas = document.createElement('canvas')
         let context = canvas.getContext('2d')
         let image = new Image()
