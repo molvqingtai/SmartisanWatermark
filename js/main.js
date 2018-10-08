@@ -133,28 +133,34 @@
     let ontrolState = (state, image) => {
         switch (state) {
             case 'start':
-                iconsBtn.firstElementChild.style.display = 'block'
-                iconsBtn.lastElementChild.style.display = 'none'
-                downloadBtn.innerHTML = '生成水印中...'
-                downloadBtn.href = 'javascript::void(0);'
+                (() => {
+                    iconsBtn.firstElementChild.style.display = 'block'
+                    iconsBtn.lastElementChild.style.display = 'none'
+                    downloadBtn.innerHTML = '生成水印中...'
+                    downloadBtn.href = 'javascript::void(0);'
+                })()
                 break
 
             case 'end':
-                displayImg.src = downloadBtn.href = image.url
-                displayImg.onload = () => {
-                    downloadBtn.download = image.name
-                    iconsBtn.firstElementChild.style.display = 'none'
-                    iconsBtn.lastElementChild.style.display = 'block'
-                    downloadBtn.innerHTML = `下载水印照片<i class="material-icons">file_download</i>`
-                    downloadBtn.removeAttribute('disabled')
-                }
+                (() => {
+                    displayImg.src = downloadBtn.href = image.url
+                    displayImg.onload = () => {
+                        downloadBtn.download = image.name
+                        iconsBtn.firstElementChild.style.display = 'none'
+                        iconsBtn.lastElementChild.style.display = 'block'
+                        downloadBtn.innerHTML = `下载水印照片<i class="material-icons">file_download</i>`
+                        downloadBtn.removeAttribute('disabled')
+                    }
+                })()
                 break
 
             case 'error':
-                iconsBtn.firstElementChild.style.display = 'none'
-                iconsBtn.lastElementChild.style.display = 'block'
-                downloadBtn.innerHTML = `下载水印照片<i class="material-icons">file_download</i>`
-                downloadBtn.setAttribute('disabled', 'disabled')
+                (() => {
+                    iconsBtn.firstElementChild.style.display = 'none'
+                    iconsBtn.lastElementChild.style.display = 'block'
+                    downloadBtn.innerHTML = `下载水印照片<i class="material-icons">file_download</i>`
+                    downloadBtn.setAttribute('disabled', 'disabled')
+                })()
                 break
         }
     }
