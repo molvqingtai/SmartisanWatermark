@@ -8,4 +8,7 @@ Smartisan 相机水印生成工具
 
 ## 运行
 
-`npm install && npm dev`
+
+```
+npm install && npm run dev
+```
