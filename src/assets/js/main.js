@@ -4,7 +4,7 @@ import EXIF from 'exif-js'
 import tinycolor from 'tinycolor2'
 import ColorThief from 'color-thief'
 
-(() => {
+((window) => {
     let displayImg = document.querySelector('#display-img')
     let uploadImg = document.querySelector('#upload-img')
     let downloadBtn = document.querySelector('#download-btn')
@@ -60,22 +60,21 @@ import ColorThief from 'color-thief'
      * @return {[String]}            [图片Blob url]
      */
     let drawing = (exif, base64) => {
-
         let canvas = document.createElement('canvas')
         let context = canvas.getContext('2d')
         let image = new Image()
         let dx = 0
         let dy = 0
-        let dw = exif.PixelXDimension
-        let dh = exif.PixelYDimension
-        let sx = exif.PixelXDimension * 0.02
-        let sy = exif.PixelYDimension * 0.02
-        let sw = exif.PixelXDimension * 0.96
-        let sh = exif.PixelYDimension * 0.96
-        let fx = exif.PixelXDimension * 0.04
-        let fy = exif.PixelYDimension * 1.04
-        canvas.width = exif.PixelXDimension
-        canvas.height = exif.PixelYDimension + exif.PixelYDimension * 0.12
+        let dw = exif.ImageWidth
+        let dh = exif.ImageHeight
+        let sx = exif.ImageWidth * 0.02
+        let sy = exif.ImageHeight * 0.02
+        let sw = exif.ImageWidth * 0.96
+        let sh = exif.ImageHeight * 0.96
+        let fx = exif.ImageWidth * 0.04
+        let fy = exif.ImageHeight * 1.04
+        canvas.width = exif.ImageWidth
+        canvas.height = exif.ImageHeight + exif.ImageHeight * 0.12
 
         return new Promise((resolve, reject) => {
             image.onload = () => {
@@ -97,7 +96,6 @@ import ColorThief from 'color-thief'
                     })
                 })
             }
-            //可以直接用URL.createObjectURL(file),但是会多创建一个url对象
             image.src = base64
         })
     }
