@@ -21,9 +21,8 @@
     "dependencies": {
         "assets": "^3.0.0",
         "babel-polyfill": "^6.26.0",
-        "blob-polyfill": "^3.0.20180112",
+        "blueimp-load-image": "^2.19.0",
         "color-thief": "^2.2.3",
-        "exif-js": "^2.3.0",
         "materialize-css": "^1.0.0-rc.2",
         "src": "^1.1.2",
         "tinycolor2": "^1.4.1"

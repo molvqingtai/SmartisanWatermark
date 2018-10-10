@@ -57,7 +57,7 @@ html, body {
 .form-wrapper .img {
     max-width: 100%;
     height: auto;
-    font-family: 'Smartisan';
+    cursor: pointer;
 }
 
 .form-wrapper .update-btn {

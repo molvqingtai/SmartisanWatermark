@@ -1,9 +1,7 @@
-import 'blob-polyfill'
 import M from 'materialize-css'
-import EXIF from 'exif-js'
 import tinycolor from 'tinycolor2'
 import ColorThief from 'color-thief'
-
+import loadImage from 'blueimp-load-image'
 ((window) => {
     let displayImg = document.querySelector('#display-img')
     let uploadImg = document.querySelector('#upload-img')
@@ -28,26 +26,25 @@ import ColorThief from 'color-thief'
     let stamp = (file) => {
         if (file) {
             if (/image\/\w+/.test(file.type)) {
-                getEXIF(file).then((res) => {
-                    if (Object.keys(res).length > 0 && res.Make && res.Make.includes('Smartisan')) {
-                        let reader = new FileReader()
-                        reader.onload = (e) => {
-                            ontrolState('start')
-                            drawing(res, e.target.result).then((res) => {
-                                let name = file.name.slice(0, file.name.lastIndexOf('.')) + '.jpeg'
-                                ontrolState('end', { url: res, name: name })
-                            }, (rej) => {
-                                toastTip('照片EXIF信息错误!')
-                                ontrolState('error')
-                            })
-                        }
-                        reader.readAsDataURL(file)
+                ontrolState('start')
+                loadImage(file, (canvas, data) => {
+                    let exif = data.exif
+                    if (exif && exif.get('Make') && exif.get('Make').includes('Smartisan')) {
+                        drawing(canvas, exif.get('Model')).then((res) => {
+                            let name = file.name.slice(0, file.name.lastIndexOf('.')) + '.jpeg'
+                            ontrolState('end', '绘制完成,点击预览!', { url: res, name: name })
+                        }, (rej) => {
+                            ontrolState('error', 'EXIF信息错误!')
+                        })
                     } else {
-                        toastTip('请上传Smartisan相机照片!')
+                        ontrolState('error', '请上传Smartisan相机照片!')
                     }
+                }, {
+                    orientation: true,
+                    downsamplingRatio: 1.0,
                 })
             } else {
-                toastTip('照片格式错误!')
+                ontrolState('error', '照片格式错误!')
             }
         }
 
@@ -56,62 +53,47 @@ import ColorThief from 'color-thief'
     /**
      * [drawing 绘制水印]
      * @param  {[Object]}   exif     [图片EXIF]
-     * @param  {[String]}   base64   [图片Base64]
+     * @param  {[Object]}   sourceCanvas  [图片Canvas]
+     * @param  {[String]}   watermark  [图片水印文字]
      * @return {[String]}            [图片Blob url]
      */
-    let drawing = (exif, base64) => {
+    let drawing = (sourceCanvas, watermark) => {
         let canvas = document.createElement('canvas')
-        let context = canvas.getContext('2d')
-        let image = new Image()
+        let pen = canvas.getContext('2d')
         let dx = 0
         let dy = 0
-        let dw = exif.ImageWidth
-        let dh = exif.ImageHeight
-        let sx = exif.ImageWidth * 0.02
-        let sy = exif.ImageHeight * 0.02
-        let sw = exif.ImageWidth * 0.96
-        let sh = exif.ImageHeight * 0.96
-        let fx = exif.ImageWidth * 0.04
-        let fy = exif.ImageHeight * 1.04
-        canvas.width = exif.ImageWidth
-        canvas.height = exif.ImageHeight + exif.ImageHeight * 0.12
+        let dw = sourceCanvas.width
+        let dh = sourceCanvas.height
+        let sx = sourceCanvas.width * 0.02
+        let sy = sourceCanvas.width * 0.02
+        let sw = sourceCanvas.width * 0.96
+        let sh = sourceCanvas.height * 0.96
+        let fx = sourceCanvas.width * 0.04
+        let fy = sourceCanvas.height * 1.04
+        canvas.width = sourceCanvas.width
+        canvas.height = sourceCanvas.height + sourceCanvas.height * 0.1
 
         return new Promise((resolve, reject) => {
-            image.onload = () => {
-                document.fonts.load('100px Smartisan').then(() => {
-                    getColor(image).then((res) => {
-                        context.fillStyle = '#FFFFFF'
-                        context.fillRect(0, 0, canvas.width, canvas.height)
-                        context.drawImage(image, dx, dy, dw, dh, sx, sy, sw, sh)
-                        context.font = '700 100px sans-serif,Smartisan'
-                        context.fillStyle = res
-                        context.fillText(`\ue900  Shot on ${exif.Model}`, fx, fy)
-                        canvas.toBlob((blob) => {
-                            try {
-                                resolve(URL.createObjectURL(blob))
-                            } catch (error) {
-                                reject(error)
-                            }
-                        }, 'image/jpeg', 1.0)
-                    })
+            document.fonts.load('100px Smartisan').then(() => {
+                getColor(sourceCanvas).then((res) => {
+                    pen.fillStyle = 'rgb(255,255,255)'
+                    pen.fillRect(0, 0, canvas.width, canvas.height)
+                    pen.drawImage(sourceCanvas, dx, dy, dw, dh, sx, sy, sw, sh)
+                    pen.font = '700 100px sans-serif,Smartisan'
+                    pen.fillStyle = res
+                    pen.fillText(`\ue900  Shot on ${watermark}`, fx, fy)
+                    canvas.toBlob((blob) => {
+                        try {
+                            resolve(URL.createObjectURL(blob))
+                        } catch (error) {
+                            reject(error)
+                        }
+                    }, 'image/jpeg', 1.0)
                 })
-            }
-            image.src = base64
-        })
-    }
-
-    /**
-     * [getEXIF 获取EXIF]
-     * @param  {[Object]} file [图片数据]
-     * @return {[Object]}      [EXIF对象]
-     */
-    let getEXIF = (file) => {
-        return new Promise((resolve, reject) => {
-            EXIF.getData(file, function() {
-                resolve(EXIF.getAllTags(this))
             })
         })
     }
+
 
     /**
      * [getColor 获取主色]
@@ -133,27 +115,28 @@ import ColorThief from 'color-thief'
     /**
      * [ontrolState 状态控制]
      * @param  {[String]} state [状态信息]
-     * @param  {[Object]} image [图片信息]
+     * @param  {[String]} msg [提示信息]
+     * @param  {[Object]} attrs [图片属性]
      */
-    let ontrolState = (state, image) => {
+    let ontrolState = (state, msg = false, attrs) => {
         switch (state) {
             case 'start':
                 (() => {
                     iconsBtn.firstElementChild.style.display = 'block'
                     iconsBtn.lastElementChild.style.display = 'none'
-                    downloadBtn.innerHTML = '生成水印中...'
+                    downloadBtn.innerHTML = '绘制水印中...'
                     downloadBtn.href = 'javascript::void(0);'
                 })()
                 break
 
             case 'end':
                 (() => {
-                    displayImg.src = downloadBtn.href = image.url
+                    displayImg.src = downloadBtn.href = attrs.url
                     displayImg.onload = () => {
-                        downloadBtn.download = image.name
+                        downloadBtn.download = attrs.name
                         iconsBtn.firstElementChild.style.display = 'none'
                         iconsBtn.lastElementChild.style.display = 'block'
-                        downloadBtn.innerHTML = `下载水印照片<i class="material-icons">file_download</i>`
+                        downloadBtn.innerHTML = `保存水印照片<i class="material-icons">file_download</i>`
                         downloadBtn.removeAttribute('disabled')
                     }
                 })()
@@ -163,24 +146,19 @@ import ColorThief from 'color-thief'
                 (() => {
                     iconsBtn.firstElementChild.style.display = 'none'
                     iconsBtn.lastElementChild.style.display = 'block'
-                    downloadBtn.innerHTML = `下载水印照片<i class="material-icons">file_download</i>`
+                    downloadBtn.innerHTML = `保存水印照片<i class="material-icons">file_download</i>`
                     downloadBtn.setAttribute('disabled', 'disabled')
                 })()
                 break
         }
-    }
-
-    /**
-     * [toastTip 弹窗提示]
-     * @param  {[String]} msg [提示信息]
-     */
-    let toastTip = (msg) => {
         uploadImg.value = ''
-        M.toast({
-            html: msg,
-            displayLength: 3000,
-            classes: 'rounded'
-        })
+        if (msg) {
+            M.toast({
+                html: msg,
+                displayLength: 3000,
+                classes: 'rounded'
+            })
+        }
     }
 
     /**
