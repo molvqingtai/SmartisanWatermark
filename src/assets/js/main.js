@@ -32,7 +32,7 @@ import loadImage from 'blueimp-load-image'
                     if (exif && exif.get('Make') && exif.get('Make').includes('Smartisan')) {
                         drawing(canvas, exif.get('Model')).then((res) => {
                             let name = file.name.slice(0, file.name.lastIndexOf('.')) + '.jpeg'
-                            ontrolState('end', '绘制完成,点击预览!', { url: res, name: name })
+                            ontrolState('end', false, { url: res, name: name })
                         }, (rej) => {
                             ontrolState('error', 'EXIF信息错误!')
                         })
