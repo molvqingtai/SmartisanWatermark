@@ -23,32 +23,36 @@ import loadImage from 'blueimp-load-image'
      * [stamp 水印戳]
      * @param  {[Object]} file [图片数据]
      */
-    let stamp = (file) => {
-        if (file) {
-            if (/image\/\w+/.test(file.type)) {
-                ontrolState('start')
-                loadImage(file, (canvas, data) => {
-                    let exif = data.exif
-                    if (exif && exif.get('Make') && exif.get('Make').includes('Smartisan')) {
-                        drawing(canvas, exif.get('Model')).then((res) => {
-                            let name = file.name.slice(0, file.name.lastIndexOf('.')) + '.jpeg'
-                            ontrolState('end', false, { url: res, name: name })
-                        }, (rej) => {
-                            ontrolState('error', 'EXIF信息错误!')
-                        })
-                    } else {
-                        ontrolState('error', '请上传Smartisan相机照片!')
-                    }
-                }, {
-                    orientation: true,
-                    downsamplingRatio: 1.0,
-                })
-            } else {
-                ontrolState('error', '照片格式错误!')
+    let stamp = (() => {
+        let blobUrl = null
+        return (file) => {
+            if (file) {
+                if (/image\/\w+/.test(file.type)) {
+                    ontrolState('start')
+                    loadImage(file, (canvas, data) => {
+                        let exif = data.exif
+                        if (exif && exif.get('Make') && exif.get('Make').includes('Smartisan')) {
+                            drawing(canvas, exif.get('Model')).then(
+                                (res) => {
+                                    let name = file.name.slice(0, file.name.lastIndexOf('.')) + '.jpeg'
+                                    ontrolState('end', false, { url: res, name: name })
+                                    blobUrl ? (URL.revokeObjectURL(blobUrl), blobUrl = res) : blobUrl = res
+                                }, (rej) => {
+                                    ontrolState('error', 'EXIF信息错误!')
+                                })
+                        } else {
+                            ontrolState('error', '请上传Smartisan相机照片!')
+                        }
+                    }, {
+                        orientation: true,
+                        downsamplingRatio: 1.0,
+                    })
+                } else {
+                    ontrolState('error', '照片格式错误!')
+                }
             }
         }
-
-    }
+    })()
 
     /**
      * [drawing 绘制水印]
@@ -151,7 +155,6 @@ import loadImage from 'blueimp-load-image'
                 })()
                 break
         }
-        uploadImg.value = ''
         if (msg) {
             M.toast({
                 html: msg,
@@ -159,6 +162,7 @@ import loadImage from 'blueimp-load-image'
                 classes: 'rounded'
             })
         }
+        uploadImg.value = ''
     }
 
     /**
