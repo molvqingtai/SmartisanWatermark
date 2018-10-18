@@ -2,6 +2,7 @@ import M from 'materialize-css'
 import tinycolor from 'tinycolor2'
 import ColorThief from 'color-thief'
 import loadImage from 'blueimp-load-image'
+
 ((window) => {
     let displayImg = document.querySelector('#display-img')
     let uploadImg = document.querySelector('#upload-img')
