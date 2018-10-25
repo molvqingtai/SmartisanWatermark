@@ -130,7 +130,7 @@ import loadImage from 'blueimp-load-image'
                     iconsBtn.firstElementChild.style.display = 'block'
                     iconsBtn.lastElementChild.style.display = 'none'
                     downloadBtn.innerHTML = '绘制水印中...'
-                    downloadBtn.href = 'javascript::void(0);'
+                    downloadBtn.setAttribute('disabled', 'disabled')
                 })()
                 break
 
