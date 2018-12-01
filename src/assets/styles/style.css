@@ -66,10 +66,13 @@ html, body {
     padding: 0;
 }
 
-.form-wrapper .file-path.valid {
+.form-wrapper .file-path {
     overflow: hidden;
-	text-overflow:ellipsis;
-	white-space: nowrap;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.form-wrapper .file-path.valid {
     box-shadow: 1px 1px 0 0 #4CAF50 !important;
 }
 
