@@ -67,6 +67,9 @@ html, body {
 }
 
 .form-wrapper .file-path.valid {
+    overflow: hidden;
+	text-overflow:ellipsis;
+	white-space: nowrap;
     box-shadow: 1px 1px 0 0 #4CAF50 !important;
 }
 
